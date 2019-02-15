@@ -14,6 +14,7 @@ type SlidingWindow struct {
 	window      time.Duration
 	granularity time.Duration
 	samples     []float64
+	counts      []int64
 	pos         int
 	size        int
 	stopOnce    sync.Once
@@ -47,6 +48,7 @@ func New(window, granularity time.Duration) (*SlidingWindow, error) {
 		window:      window,
 		granularity: granularity,
 		samples:     make([]float64, int(window/granularity)),
+		counts:      make([]int64, int(window/granularity)),
 		stopC:       make(chan struct{}),
 		size:        int(window / granularity),
 	}
@@ -66,6 +68,7 @@ func (sw *SlidingWindow) shifter() {
 				sw.pos = 0
 			}
 			sw.samples[sw.pos] = 0
+			sw.counts[sw.pos] = 0
 			sw.Unlock()
 
 		case <-sw.stopC:
@@ -78,6 +81,7 @@ func (sw *SlidingWindow) shifter() {
 func (sw *SlidingWindow) Add(v float64) {
 	sw.Lock()
 	sw.samples[sw.pos] += v
+	sw.counts[sw.pos]++
 	sw.Unlock()
 }
 
@@ -112,11 +116,12 @@ func (sw *SlidingWindow) Stop() {
 
 // Total returns the sum of all values over the specified window, as well as
 // the number of samples.
-func (sw *SlidingWindow) Total(window time.Duration) (float64, int) {
+func (sw *SlidingWindow) Total(window time.Duration) (float64, int64) {
 	if window > sw.window {
 		window = sw.window
 	}
 
+	totalCount := int64(0)
 	sampleCount := int(window / sw.granularity)
 	if sampleCount > sw.size {
 		sampleCount = sw.size
@@ -133,7 +138,8 @@ func (sw *SlidingWindow) Total(window time.Duration) (float64, int) {
 		}
 
 		total += sw.samples[pos]
+		totalCount += sw.counts[pos]
 	}
 
-	return total, sampleCount
+	return total, totalCount
 }

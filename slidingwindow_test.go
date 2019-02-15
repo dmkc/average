@@ -51,7 +51,8 @@ func TestAverage(t *testing.T) {
 	sw := &SlidingWindow{
 		window:      10 * time.Second,
 		granularity: time.Second,
-		samples:     []float64{1, 2, 5, 0, 0, 0, 0, 0, 4, 0},
+		samples:     []float64{2, 2, 5, 0, 0, 0, 0, 0, 4, 0},
+		counts:      []int64{10, 1, 5, 0, 0, 0, 0, 0, 4, 0},
 		pos:         1,
 		size:        10,
 	}
@@ -62,7 +63,7 @@ func TestAverage(t *testing.T) {
 	if v := sw.Average(time.Second); v != 2 {
 		t.Errorf("expected the average over the last second to be 2, not %f", v)
 	}
-	if v := sw.Average(2 * time.Second); v != 1.5 {
+	if v := sw.Average(2 * time.Second); v != 0.363636 {
 		t.Errorf("expected the average over the 2 seconds to be 1.5, not %f", v)
 	}
 	if v := sw.Average(4 * time.Second); v != 1.75 {
@@ -109,6 +110,7 @@ func TestTotal(t *testing.T) {
 		window:      10 * time.Second,
 		granularity: time.Second,
 		samples:     []float64{1, 2, 5, 0, 0, 0, 0, 0, 4, 0},
+		counts:      []int64{1, 2, 2, 0, 0, 0, 0, 0, 4, 0},
 		pos:         1,
 		size:        10,
 	}
