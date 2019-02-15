@@ -50,7 +50,7 @@ func TestAverage(t *testing.T) {
 		window:      10 * time.Second,
 		granularity: time.Second,
 		samples:     []float64{1, 2, 5, 0, 0, 0, 0, 0, 4, 0},
-		pos:         2,
+		pos:         1,
 		size:        10,
 	}
 
@@ -107,7 +107,7 @@ func TestTotal(t *testing.T) {
 		window:      10 * time.Second,
 		granularity: time.Second,
 		samples:     []float64{1, 2, 5, 0, 0, 0, 0, 0, 4, 0},
-		pos:         2,
+		pos:         1,
 		size:        10,
 	}
 

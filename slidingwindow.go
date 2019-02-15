@@ -128,7 +128,7 @@ func (sw *SlidingWindow) Total(window time.Duration) (float64, int) {
 	defer sw.RUnlock()
 
 	var total float64
-	for i := 1; i <= sampleCount; i++ {
+	for i := 0; i < sampleCount; i++ {
 		pos := sw.pos - i
 		if pos < 0 {
 			pos += len(sw.samples)
