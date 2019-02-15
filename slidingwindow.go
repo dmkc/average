@@ -103,6 +103,7 @@ func (sw *SlidingWindow) Reset() {
 	sw.pos, sw.size = 0, 0
 	for i := range sw.samples {
 		sw.samples[i] = 0
+		sw.counts[i] = 0
 	}
 }
 

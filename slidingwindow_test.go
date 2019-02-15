@@ -37,6 +37,7 @@ func TestAdd(t *testing.T) {
 		window:      2 * time.Second,
 		granularity: time.Second,
 		samples:     []float64{1, 1},
+		counts:      []int64{1, 2},
 		pos:         1,
 		size:        2,
 	}
@@ -51,31 +52,18 @@ func TestAverage(t *testing.T) {
 	sw := &SlidingWindow{
 		window:      10 * time.Second,
 		granularity: time.Second,
-		samples:     []float64{2, 2, 5, 0, 0, 0, 0, 0, 4, 0},
-		counts:      []int64{10, 1, 5, 0, 0, 0, 0, 0, 4, 0},
+		samples:     []float64{20, 4, 5, 0, 0, 0, 0, 0, 4, 10},
+		counts:      []int64{10, 2, 5, 0, 0, 0, 0, 0, 4, 2},
 		pos:         1,
 		size:        10,
 	}
 
-	if v := sw.Average(0); v != 0 {
-		t.Errorf("expected the average with a window of 0 seconds be 0, not %f", v)
-	}
-	if v := sw.Average(time.Second); v != 2 {
-		t.Errorf("expected the average over the last second to be 2, not %f", v)
-	}
-	if v := sw.Average(2 * time.Second); v != 0.363636 {
-		t.Errorf("expected the average over the 2 seconds to be 1.5, not %f", v)
-	}
-	if v := sw.Average(4 * time.Second); v != 1.75 {
-		t.Errorf("expected the average over the 4 seconds to be 1.75, not %f", v)
-	}
-	if v := sw.Average(10 * time.Second); v != 1.20 {
-		t.Errorf("expected the average over the 10 seconds to be 1.20, not %f", v)
-	}
-	// This one should be equivalent to 10 seconds.
-	if v := sw.Average(20 * time.Second); v != 1.20 {
-		t.Errorf("expected the average over the 20 seconds to be 1.20, not %f", v)
-	}
+	assert.Equal(t, 0.0, sw.Average(0))
+	assert.Equal(t, 2.0, sw.Average(time.Second))
+	assert.Equal(t, 2.0, sw.Average(2*time.Second))
+	assert.Equal(t, 2.111111111111111, sw.Average(4*time.Second))
+	assert.Equal(t, 1.8695652173913044, sw.Average(10*time.Second))
+	assert.Equal(t, 1.8695652173913044, sw.Average(20*time.Second))
 }
 
 func TestReset(t *testing.T) {
