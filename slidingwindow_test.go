@@ -3,6 +3,8 @@ package average
 import (
 	"testing"
 	"time"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNew(t *testing.T) {
@@ -130,4 +132,15 @@ func TestTotal(t *testing.T) {
 	if v, _ := sw.Total(20 * time.Second); v != 12 {
 		t.Errorf("expected the total over the last 10 seconds to be 12, not %f", v)
 	}
+}
+
+func TestTotalFromNew(t *testing.T) {
+	sw := MustNew(10*time.Second, time.Second)
+
+	sw.Add(10)
+	sw.Add(20)
+	total, samples := sw.Total(time.Second)
+
+	assert.Equal(t, 30.0, total)
+	assert.Equal(t, 1, samples)
 }

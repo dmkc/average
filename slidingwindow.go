@@ -48,6 +48,7 @@ func New(window, granularity time.Duration) (*SlidingWindow, error) {
 		granularity: granularity,
 		samples:     make([]float64, int(window/granularity)),
 		stopC:       make(chan struct{}),
+		size:        int(window / granularity),
 	}
 
 	go sw.shifter()
@@ -65,9 +66,6 @@ func (sw *SlidingWindow) shifter() {
 				sw.pos = 0
 			}
 			sw.samples[sw.pos] = 0
-			if sw.size < len(sw.samples) {
-				sw.size++
-			}
 			sw.Unlock()
 
 		case <-sw.stopC:
